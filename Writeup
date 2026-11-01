@@ -1,0 +1,108 @@
+# Audio PII Anonymizer — Technical Write-Up
+
+## 1. Approach & What We Built
+
+Customer-support calls in Indian languages present challenges that break standard English audio redaction pipelines: **code-switching** (English digits and PIN codes inside Hindi or Tamil sentences), **grouped and repeated digits** (`"double ஆறு"`, `"triple five"`), **colloquial spoken numerals** (spoken Tamil `"ஒன்னு, ரெண்டு, மூணு, அஞ்சு"` alongside literary forms), **uncased Indic scripts**, and **agent read-backs** where a single first name (`"धन्यवाद प्रिया जी"`, `"நன்றி கார்த்திக்"`) or partial number is repeated later in the call.
+
+To meet the three core requirements—**no PII leaks**, **minimal collateral damage to surrounding speech**, and **byte-for-byte repeatability**—we built a deterministic, five-stage pipeline (`pii_anonymizer`) whose primary output is an independent copy of the recording (`<stem>_redacted.wav`) with every PII interval overwritten by a speaker-loudness-matched `1000 Hz` beep:
+
+1. **Native-Dtype Audio I/O (`audio.py`):** Decodes `.wav` and `.mp3` inputs while preserving native integer/float PCM representations for WAV files, cloning the sample buffer (`Audio.copy()`) so every sample outside a beep span remains `100%` bit-identical to the input and the frame count, sample rate, and channel count match with `0.0 ms` drift.
+2. **Deterministic Speech Recognition & Content Cache (`asr.py`, `cache.py`):** Runs `faster-whisper` (`CTranslate2`, `int8` on CPU / `float16` on CUDA) with greedy/beam decoding at `temperature=[0.0]`, `condition_on_previous_text=False`, and fixed Silero VAD thresholds. Word-level transcripts are cached under `SHA-256(audio_bytes + model + language + decode_params)` so repeat runs execute in `0.05 s` without loading Whisper.
+3. **Sub-Word Tokenization & Cross-Script Normalization (`tokens.py`, `textnorm.py`):** Splits hyphenated/grouped numerals (`"9845-012-345"`) with character-proportional timestamps, normalizes Unicode nukta/chandrabindu/zero-width joiners, and computes a script-agnostic `phonetic_key` mapping Devanagari, Tamil, Kannada, and Latin spellings to a shared consonant-vowel skeleton (`"Karthik"` == `"கார்த்திக்"` == `"कार्तिक"` == `"kartik"`).
+4. **Declarative Language-Pack Detectors (`numbers.py`, `names.py`, `languages/*.yaml`):**
+   - *Number FSM:* Parses mixed native/English digits, `10–99` compounds (`"चौरानवे"` = `94`), combining tens + units, hundreds, `"double"`/`"triple"` modifiers, filler words inside pauses, and agent partial read-backs near `mobile`/`pincode` keywords.
+   - *Five-Signal Name Engine:* Combines (a) strong introduction cues (`"मेरा नाम"`, `"என் பெயர்"`, `"my name is"`), (b) conversational frames (`"मैं <X> बोल रहा हूँ"`), (c) pre/post honorifics (`"<X> जी"`, `"<X> சார்"`, `"श्री <X>"`), (d) cross-script phonetic gazetteer lookup, and (e) **call-wide entity memory** that redacts every subsequent agent or customer repeat of any discovered name token.
+5. **10 ms RMS Acoustic Boundary Alignment & Speaker-Matched Beep Synthesis (`spans.py`, `audio.py`):** Refines noisy ASR word timestamps against the raw `10 ms` RMS energy contour of the waveform, pads boundaries safely (`80 ms` pre / `100 ms` post), and replaces (never mixes) PII samples with a `1000 Hz` sine wave shaped with `5 ms` raised-cosine ramps and matched to the active speech RMS of the speaker in that span.
+
+---
+
+## 2. What We Tried & What Failed
+
+To evaluate redaction objectively rather than solely by ear, we built [`scripts/evaluate.py`](scripts/evaluate.py), which scores redacted audio against exact segment-level ground truth on two competing metrics:
+- **`LEAK` (ms):** voiced speech energy inside a ground-truth PII span not covered by a beep (target: `0 ms`; a single leaked digit is `~300–500 ms`).
+- **`EXTRA` (s):** audio outside ground-truth PII spans covered by a beep beyond a `0.25 s` transition margin (target: as close to `0.0 s` as possible).
+
+Iterative testing exposed six concrete failures that shaped the final system:
+
+### 2.1 Off-the-Shelf Text NER Failed on Uncased Indic ASR & Single-Name Agent Repeats
+- **What we tried:** Running standard multilingual NER over Whisper transcripts.
+- **What failed:** Indic scripts lack capitalization and ASR output lacks reliable punctuation. Single-token agent acknowledgments (`"धन्यवाद प्रिया जी"`, `"நன்றி கார்த்திக்"`) were missed (leaking the customer's first name), while lowering confidence thresholds caused false-positive beeps on polite verbs and common nouns.
+- **Resolution:** Built the five-signal name detector in `names.py` with **call-wide entity memory**. Once `"प्रिया शर्मा"` is introduced after `"मेरा नाम"`, both `"प्रिया"` and `"शर्मा"` are registered by normalized form and `phonetic_key`, guaranteeing that `"धन्यवाद प्रिया जी"` is redacted even without an introduction cue.
+
+### 2.2 SOV Sentence-Final Verbs Triggered Weak Name Cues
+- **What we tried:** Allowing `weak_cues` (`"नाम"`, `"பெயர்"`) to accept a following token whenever it appeared at the end of a sentence (`sentence_end=True`).
+- **What failed:** Hindi and Tamil are Subject-Object-Verb (SOV) languages. In the agent prompt `"अपना नाम बताइए।"` (transcribed by `large-v3-turbo` as `"अपना नाम बताए।"`), the verb `"बताए।"` immediately follows `"नाम"` at a sentence boundary. Treating `sentence_end` as a valid terminator misclassified `"बताए"` as a customer name and then beeped `"बताए"` again via call memory in `"मोबाइल नंबर बताए।"`.
+- **Resolution:** Restricted `weak_cues` so `sentence_end` alone never validates an unknown word; a weak cue now requires either an explicit lexical terminator (`"है"`, `"जी"`, `"தான்"`) or a phonetic gazetteer match (whereas strong cues like `"मेरा नाम"` still accept arbitrary out-of-vocabulary names), alongside expanded verb-inflection stopwords.
+
+### 2.3 Whisper DTW Timestamp Compression & Turn-Silence Gluing (`190–520 ms` Digit Leaks)
+- **What we tried:** Using Whisper's raw `[word.start, word.end]` timestamps with `±100 ms` padding, clamped strictly to `[prev_word.end, next_word.start]` so neighboring words would not be clipped.
+- **What failed:** Two systematic Whisper DTW alignment bugs caused `190–520 ms` leaks on final digits:
+  1. Whisper converts multi-second spoken digit sequences (`"पाँच छह शून्य शून्य तीन चार"`, `2.4 s` of speech) into a single written numeral token `"560034।"` whose reported DTW window often covers only `0.5–1.2 s`.
+  2. Whisper routinely sets `next_word.start == digit_word.end`, absorbing the final `200–500 ms` of the last spoken digit *plus* the following `600 ms` turn pause into the next turn's first word (`"ठीक"`, `"சரி"`, `"धन्यवाद"`). Clamping at `next_word.start` left the final digit (`"चार"`, `"ஏழு"`, `"छह"`) audible.
+- **Resolution (`spans.py:_EnergyIndex`):** Built a four-step `10 ms` RMS acoustic aligner: (1) `trim_outer_silence` strips dead turn-silence glued onto PII tokens; (2) `true_offset` / `true_onset` scans adjacent non-PII tokens for internal silence valleys `>= 280 ms` (impossible inside one spoken word, always an absorbed turn boundary) to locate the neighbor word's true acoustic edge; (3) `extend_with_gaps` bridges grouped-digit pauses (`<= 420 ms`) up to those true acoustic guardrails; and (4) `finish_voiced_burst` walks to the end of any mid-syllable boundary before short `< 280 ms` intra-turn pauses while protecting at least `180 ms` of the neighbor word. Leaks dropped from `520 ms` to **`0–10 ms`**.
+
+### 2.4 Abandoned Heuristic: Gating Acoustic Extension by Span Duration (`min_full_dur`)
+- **What we tried:** Skipping `extend_with_gaps` whenever a detected mobile span already exceeded `min_full_dur = 3.6 s`, hoping to shave `~0.1 s` of extra beep padding.
+- **What failed:** On `sample_1_hindi.wav` under greedy `large-v3` decoding, the first nine digits spanned `3.8 s` (exceeding `3.6 s`), while the tenth digit sat across a short pause that Whisper glued onto the next turn—re-introducing a **`280 ms` leak**.
+- **Resolution:** Reverted the duration gate immediately. Running `extend_with_gaps` unconditionally within `true_onset`/`true_offset` acoustic guardrails guarantees zero digit leaks across all models.
+
+### 2.5 Code-Mixed Repeaters (`"double ஆறு"` -> `"double R"`), Lexicon Collisions & Tamil Alveolar `ன`
+- **What we tried:** Naive YAML number lexicons, stripping weak homophone digits (`"to"`, `"for"`, `"नो"`, `"r"`) from run edges whenever `>= 6` digits remained, and default ITRANS transliteration for Tamil.
+- **What failed:**
+  1. In Tamil Sample 2, `"double ஆறு"` (`ஆறு` = `6`) was transcribed by `large-v3-turbo` as `"double R"`.
+  2. Duplicate YAML keys (`"11".."19"` listed twice in `hi.yaml` for native Hindi teens and English-transliterated teens) silently overwrote the native Hindi teen words (`"ग्यारह".."उन्नीस"`).
+  3. Tamil alveolar `ன` (`U+0BA9` in `"ராஜன்"`) transliterated to `^n` in ITRANS; stripping punctuation dropped `^` and caused final-nasal mismatches against `"Rajan"`.
+- **Resolution:** Added `"r"`/`"ar"` as a weak digit for `6` in `ta.yaml` and forbade `_trim_weak_edges` from stripping any weak digit governed by a `REPEAT` token (`"double R"`); merged teen lists and added an automated `LexiconError` collision check on pack load (`languages/__init__.py`); folded Tamil `ன` (`\u0ba9`) to `ந` (`\u0ba8`) before ITRANS in `textnorm.py`.
+
+### 2.6 CPU Cold-Start Latency & Two-Speaker Beep Loudness Mismatch
+- **What we tried:** Running full 32-layer `Whisper large-v3` (`beam_size=5`) on every run (`~48 s`/call on CPU) and using a single file-wide `speech_rms` amplitude for all beeps.
+- **What failed:** `48 s` per call felt sluggish during live iteration, and a single global beep level sounded slightly loud over a quiet customer (`-22.9 dBFS`) or slightly soft over a louder agent (`-15.1 dBFS`).
+- **Resolution:** Adopted `large-v3-turbo` (`fast` preset, 4-layer decoder, `int8` beam 5) as the default—cutting cold ASR time by **2.7x** (`RTF 0.42`, `~9–11 s` per 30 s call) with `0` leaks—paired with the SHA-256 `TranscriptCache` (`0.05 s` repeat runs). In `audio.py:apply_beeps`, each beep is now matched to the **local active speech RMS** of that specific span (bounded smoothly around global speech RMS), achieving **`0.0–0.1 dB`** loudness delta on every speaker.
+
+---
+
+## 3. Measured Results on the Test Set
+
+Our evaluation suite in `samples/` comprises **4 two-speaker call recordings** (`118.4 s` total audio, `18` ground-truth PII spans) covering both brief scenarios (`Sample 1 — Hindi`, `Sample 2 — Tamil`) plus stress tests for Hinglish code-mixing, `"double"`/`"triple"` modifiers, colloquial Tamil numerals, and full agent mobile read-backs.
+
+### 3.1 Preset Speed & Accuracy Benchmark (8-Core CPU, `int8`, `118.4 s` Total Audio)
+
+| Preset (`--preset`) | Whisper Model | Beam | Cold Load | Total ASR Time | Real-Time Factor | PII Spans Matched | Worst Leak Across All Calls |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **`fast`** *(default)* | `large-v3-turbo` | `5` | `5.4 s` | **`50.1 s`** | **`0.42x`** *(2.4x faster than real-time)* | **`18 / 18` (`100%`)** | **`10 ms` (`0` leaks)** |
+| **`balanced`** | `large-v3` | `1` | `8.5 s` | `73.5 s` | `0.62x` *(1.6x faster than real-time)* | **`18 / 18` (`100%`)** | **`10 ms` (`0` leaks)** |
+| **`accurate`** | `large-v3` | `5` | `9.0 s` | `134.0 s` | `1.13x` | **`18 / 18` (`100%`)** | **`10 ms` (`0` leaks)** |
+| *Cached repeat run* | *any* | *—* | **`0.0 s`** | **`0.00 s`** | **`< 0.002x` (`0.05 s`/file)** | **`18 / 18` (`100%`)** | **`10 ms` (`0` leaks)** |
+
+### 3.2 Per-Recording Results (Default `fast` Preset — `large-v3-turbo`, Beam 5)
+
+| Recording | Lang | Length (Frames) | Expected Spans | Produced Beep Spans (`start–end` `[type]`) | Max Leak | Extra Beep | Beep Loudness Delta | Non-PII Bit-Exact |
+| :--- | :---: | :---: | :---: | :--- | :---: | :---: | :---: | :---: |
+| **`sample_1_hindi.wav`** *(Brief Sample 1)* | `hi` | `31.52 s` (`504,269`) | `4` | `7.41–8.65s` `[name]`<br>`9.46–10.56s` `[name]`<br>`14.51–19.33s` `[mobile]`<br>`23.97–26.51s` `[pincode]` | **`0 ms`** | `0.59 s` | `0.0 – 0.1 dB` | `100.0%` (`349,069` frames) |
+| **`sample_2_tamil.wav`** *(Brief Sample 2)* | `ta` | `25.85 s` (`413,566`) | `4` | `4.40–5.61s` `[name]`<br>`6.77–7.43s` `[name]`<br>`9.90–15.36s` `[mobile]`<br>`18.87–21.47s` `[pincode]` | **`10 ms`** | **`0.00 s`** | `0.0 dB` | `100.0%` (`254,686` frames) |
+| **`sample_3_hindi_codemix.wav`** *(Code-mix + double + agent read-back)* | `hi` | `34.85 s` (`557,644`) | `6` | `3.02–4.52s` `[name]`<br>`6.67–7.44s` `[name]`<br>`12.83–17.26s` `[mobile]`<br>`18.77–22.66s` `[mobile]`<br>`27.78–30.10s` `[pincode]`<br>`30.75–31.86s` `[name]` | **`0 ms`** | `0.48 s` | `0.0 dB` | `100.0%` (`333,324` frames) |
+| **`sample_4_tamil_colloquial.wav`** *(Colloquial Tamil + triple)* | `ta` | `26.18 s` (`418,883`) | `4` | `4.09–5.36s` `[name]`<br>`5.79–7.13s` `[name]`<br>`10.81–16.02s` `[mobile]`<br>`19.36–22.21s` `[pincode]` | **`0 ms`** | `0.51 s` | `0.0 dB` | `100.0%` (`248,163` frames) |
+
+- **Span Detection Precision / Recall / F1:** `18 / 18` true PII spans covered, `0` false-positive beeps, `0` leaked spans -> **Precision = `100.0%`, Recall = `100.0%`, F1 = `1.00`**.
+- **Audio & Determinism Guarantees (`13/13` automated `pytest` tests passing):** `0` frame difference (`0.0 ms` duration drift) on WAV and MP3 inputs; `1000.0 Hz` dominant FFT tone replacing PII; `100.0%` bit-for-bit preservation of all non-PII WAV frames; byte-identical `.wav` and `.json` across repeated runs.
+
+---
+
+## 4. How a Third Indian Language Is Added
+
+All language-specific knowledge is isolated in declarative YAML packs under `pii_anonymizer/languages/`—no Python detector logic in `numbers.py`, `names.py`, `spans.py`, or `pipeline.py` is hardcoded to Hindi or Tamil. To prove this architecture, we implemented and unit-tested a working **third language pack for Kannada (`kn`)** in [`pii_anonymizer/languages/kn.yaml`](pii_anonymizer/languages/kn.yaml).
+
+Adding another Indian language such as **Marathi (`mr`)**, **Telugu (`te`)**, or **Bengali (`bn`)** takes four small steps (~50 lines of YAML):
+
+1. **Create `pii_anonymizer/languages/<code>.yaml` with `include: [en]`:**
+   Inheriting `en` automatically provides English code-mixed digits (`"zero".."nine"`), English teens/tens, `"double"`/`"triple"`, and English cues (`"mobile number"`, `"pin code"`, `"my name is"`).
+2. **Fill in the Native Number & Context Lexicon:**
+   - `numbers.digits` (`0–9` in native script, spoken dialectal forms, and common ASR transliterations), `compounds` (`10–99` for fusional North Indian numerals like Marathi, or empty `{}` for agglutinative Dravidian numerals like Telugu/Kannada), `tens`, `hundred`, and `repeat` (native words for `"double"`/`"triple"`).
+   - `keywords.mobile` and `keywords.pincode` (e.g., Telugu `"ಮೊಬೈಲ್"` / `"మొబైల్"`, `"పిన్ కోడ్"`), plus `fillers` allowed inside pauses between digit groups.
+3. **Fill in Name Cues, Honorifics & Stopwords:**
+   - `names.cues` (e.g., Telugu `"నా పేరు"`, Marathi `"माझं नाव"`), `weak_cues`, `frames`, `honorifics_before`/`honorifics_after` (`"గారు"` in Telugu, `"जी"`/`"साहेब"` in Marathi), and `stopwords` (common greetings, pronouns, and polite verbs so they are never mistaken for names).
+4. **Add a 3-Line Script Hook in `textnorm.py` *(only if introducing a new Unicode script)*:**
+   - **Marathi (`mr`):** Uses Devanagari—**`0` lines of Python needed**.
+   - **Telugu (`te`) / Bengali (`bn`):** Add one Unicode-range branch (`\u0c00-\u0c7f` -> `sanscript.TELUGU`, or `\u0980-\u09ff` -> `sanscript.BENGALI`) in `textnorm.py:_to_latin` so `phonetic_key` maps native-script names onto the shared pan-Indian `gazetteer_names.txt` skeleton automatically.
+
+Once saved, `pii_anonymizer` auto-discovers the new YAML file (`--list-languages`), validates its lexicon for collisions via `pytest`, and processes calls immediately with `python -m pii_anonymizer call.wav --lang <code>`.
