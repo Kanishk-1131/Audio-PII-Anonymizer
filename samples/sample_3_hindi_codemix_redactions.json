@@ -1,0 +1,42 @@
+{
+  "input": "sample_3_hindi_codemix.wav",
+  "language": "hi",
+  "redactions": [
+    {
+      "start_sec": 3.02,
+      "end_sec": 4.52,
+      "type": "name",
+      "text": "राहुल वर्मा"
+    },
+    {
+      "start_sec": 6.67,
+      "end_sec": 7.44,
+      "type": "name",
+      "text": "राहुल"
+    },
+    {
+      "start_sec": 12.83,
+      "end_sec": 17.26,
+      "type": "mobile",
+      "text": "9810223456"
+    },
+    {
+      "start_sec": 18.77,
+      "end_sec": 22.66,
+      "type": "mobile",
+      "text": "9810223456"
+    },
+    {
+      "start_sec": 27.78,
+      "end_sec": 30.1,
+      "type": "pincode",
+      "text": "11001"
+    },
+    {
+      "start_sec": 30.75,
+      "end_sec": 31.86,
+      "type": "name",
+      "text": "राहुल"
+    }
+  ]
+}

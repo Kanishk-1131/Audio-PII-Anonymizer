@@ -1,0 +1,118 @@
+# Tamil language pack.
+# Spoken Tamil differs from written Tamil (onnu/ondru, rendu/irandu,
+# moonu/moondru, naalu/naangu, anju/ainthu ...). Both forms are listed, in
+# Tamil script and in the romanisations Whisper sometimes emits.
+code: ta
+name: Tamil
+whisper_language: ta
+include: [en]
+
+numbers:
+  digits:
+    "0": [பூஜ்யம், பூஜ்ஜியம், பூஜியம், போஜியம், போஜ்யம், பூச்சியம், பூஜ்யம்ம், சைபர், சுழியம், சுன்னம், ஜீரோ, சீரோ, ஸீரோ, ஜிரோ,
+          poojyam, pujyam, poojiyam, pujiyam, poojjiyam, pojiyam, saibar, cyber, suzhiyam, sunnam]
+    "1": [ஒன்று, ஒன்னு, ஒண்ணு, ஒன்னை, ஒண்ணை, ஒன்றூ, ஒன், வன், onnu, ondru, onru, onu, onnai]
+    "2": [இரண்டு, ரெண்டு, இரெண்டு, ரண்டு, டூ, irandu, rendu, randu, erandu]
+    "3": [மூன்று, மூணு, மூனு, மூண்ணு, த்ரீ, த்ரி, moonu, munu, moondru, moonru, moonnu]
+    "4": [நான்கு, நாலு, நாழு, ஃபோர், போர், naalu, nalu, naangu, nangu, naanku]
+    "5": [ஐந்து, அஞ்சு, அஞ்சி, அஞ்ஜு, ஃபைவ், பைவ், ainthu, aindhu, anju, anji, aindu]
+    "6": [ஆறு, சிக்ஸ், ஸிக்ஸ், aaru, aru, aaroo]
+    "7": [ஏழு, ஏளு, செவன், yezhu, ezhu, elu, ezu, yelu, eazhu]
+    "8": [எட்டு, எய்ட், எயிட், ettu, yettu, etu]
+    "9": [ஒன்பது, ஒம்பது, ஒன்பதுு, நைன், onbadhu, ombadhu, onbathu, ombathu, onpathu, onbadu]
+  weak_digits:
+    "0": [ஓ]
+    "6": [r, ar, ஆர்]
+  compounds:
+    "10": [பத்து, டென், pathu, paththu, patthu]
+    "11": [பதினொன்று, பதினொண்ணு, பதினொன்னு, பதினொன்ணு, padhinonnu, pathinonnu, padhinondru]
+    "12": [பன்னிரண்டு, பன்னெண்டு, பன்னண்டு, pannendu, pannirandu, pannandu]
+    "13": [பதிமூன்று, பதிமூணு, பதிமூனு, padhimoonu, pathimoonu]
+    "14": [பதினான்கு, பதினாலு, padhinaalu, pathinaalu, padhinaangu]
+    "15": [பதினைந்து, பதினஞ்சு, padhinanju, pathinanju, padhinainthu]
+    "16": [பதினாறு, padhinaaru, pathinaaru]
+    "17": [பதினேழு, padhinezhu, pathinezhu]
+    "18": [பதினெட்டு, padhinettu, pathinettu]
+    "19": [பத்தொன்பது, பத்தொம்பது, patthonbadhu, paththombadhu]
+    "20": [இருபது, irupadhu, irubadhu, irupathu]
+    "30": [முப்பது, muppadhu, muppathu]
+    "40": [நாற்பது, நாப்பது, narpadhu, naappadhu, naappathu]
+    "50": [ஐம்பது, அம்பது, aimbadhu, ambadhu, aimpathu]
+    "60": [அறுபது, arubadhu, arupadhu, arupathu]
+    "70": [எழுபது, ezhubadhu, ezhupadhu, ezhupathu]
+    "80": [எண்பது, enbadhu, enpathu, yenbadhu]
+    "90": [தொண்ணூறு, தொண்ணூரு, thonnooru, thonnuru]
+  # Combining forms of the tens: "இருபத்தி ஒன்று" = 21, "தொண்ணூற்றி எட்டு" = 98.
+  tens:
+    "2": [இருபத்தி, இருபத்து, இருவத்தி, ட்வென்டி, irupaththi, irubathi, iruvathi, irupathi]
+    "3": [முப்பத்தி, முப்பத்து, தர்ட்டி, muppaththi, muppathi]
+    "4": [நாற்பத்தி, நாற்பத்து, நாப்பத்தி, ஃபோர்ட்டி, naappaththi, naapathi, narpathi]
+    "5": [ஐம்பத்தி, ஐம்பத்து, அம்பத்தி, ஃபிஃப்டி, aimbaththi, ambathi, aimbathi]
+    "6": [அறுபத்தி, அறுபத்து, சிக்ஸ்டி, arubaththi, arubathi]
+    "7": [எழுபத்தி, எழுபத்து, செவன்டி, ezhubaththi, ezhupathi]
+    "8": [எண்பத்தி, எண்பத்து, எய்ட்டி, enbaththi, enbathi]
+    "9": [தொண்ணூற்றி, தொண்ணூற்று, தொண்ணூத்தி, நைன்ட்டி, thonnootri, thonnuthi, thonnutri]
+  hundred: [நூறு, நூத்தி, நூற்றி, ஹன்ட்ரட், nooru, noothi]
+  repeat:
+    "2": [டபுள், டபிள், டபுல், டப்புள், dabul, dabbul]
+    "3": [ட்ரிபிள், டிரிபிள், ட்ரிப்பிள், திரிபிள், tribil]
+
+keywords:
+  mobile: [மொபைல், மொபைல்ல, மோபாயில், மோபையில், முபைல், நம்பர், நம்பர்ல, நம்மர், நம்பு, எண், போன், ஃபோன், கைபேசி, தொலைபேசி, வாட்ஸ்அப், number, mobile, nambar, phone]
+  pincode: [பின், பின்கோடு, பின்கோட், கோடு, கோட், கோட, அஞ்சல், pincode, pin, code]
+
+fillers: [ஆமா, ஆம், அப்புறம், அப்பறம், அ, ம்ம், ஹ்ம், சரி, ஓகே, மேலும், aama, appuram, sari, um]
+
+names:
+  cues:
+    - என் பெயர்
+    - என் பேர்
+    - என்னோட பெயர்
+    - என்னோட பேர்
+    - என்னுடைய பெயர்
+    - என்னுடைய பேர்
+    - எனது பெயர்
+    - என் முழு பெயர்
+    - en peyar
+    - en per
+    - ennoda peyar
+    - ennoda per
+    - மை நேம் இஸ்
+  weak_cues:
+    - பெயர்
+    - பேர்
+    - peyar
+  gazetteer_cues:
+    - நான்
+    - naan
+    - நன்றி
+    - வணக்கம்
+  frames:
+    - [நான், பேசுறேன்]
+    - [நான், பேசுகிறேன்]
+    - [நான், பேசறேன்]
+    - [நான், பேசுறது]
+    - [naan, pesuren]
+  weak_frames:
+    - [நான், தான்]
+    - [நான், இருக்கேன்]
+  skip_after_cue: [தான், வந்து, இது]
+  terminators: [தான், ஆகும், ங்க, சார், மேடம், than, thaan]
+  honorifics_after: [சார், மேடம், அவர்கள், ஜி, அண்ணா, அக்கா, saar, sir]
+  honorifics_before: [திரு, திருமதி, செல்வி, ஸ்ரீ, மிஸ்டர், மிஸஸ், டாக்டர், thiru, thirumathi]
+  # Tamil glues particles to names ("கார்த்திக்ங்க", "கார்த்திக்கு"); strip before remembering
+  name_suffixes: [ங்க, தான், க்கு, உக்கு, ஓட, அவர்கள், ஜி]
+  stopwords: [
+    என், என்னோட, என்னுடைய, எனது, எனக்கு, உங்க, உங்கள், உங்களுடைய, உங்களோட, உங்களுக்கு,
+    நான், நாங்க, நீங்க, நீங்கள், அவர், அவங்க, அது, இது, அந்த, இந்த, யார், என்ன, எப்படி,
+    எங்கே, எப்போ, ஏன், பெயர், பேர், நன்றி, நன்சி, வணக்கம், சரி, ஆமா, ஆமாம், ஆம், இல்லை, இல்ல,
+    சார், மேடம், தான், சொல்லுங்க, சொல்லுங்கள், சொல்லு, சொல்றேன், சொல்லுறேன், கொடுங்க,
+    மொபைல், முபைல், நம்பர், நம்மர், எண், போன், பின், கோடு, கோட, பின்கோடு, முகவரி, அட்ரஸ், ஆர்டர்,
+    டெலிவரி, டிலிவரி, திலிவிரி, ஡ிலிவிரி, ஡ெலிவரி,
+    நாளைக்கு, நானைக்கு, நாளை, இன்னைக்கு, இன்று, ஆகும், ஆயிடும், ஓகே, ரொம்ப, அப்படியா, கொஞ்சம்,
+    வந்து, போய், இருக்கு, இருக்கேன், இருக்கீங்க, பேசுறேன், பேசுகிறேன், உதவி, சேவை,
+    வாடிக்கையாளர், கஸ்டமர், கேர், கம்பெனி, டபுள், ட்ரிபிள், அப்புறம், மற்றும், ஒரு,
+    en, enoda, ennoda, unga, ungal, naan, neenga, enna, peyar, per, nandri, vanakkam,
+    sari, aama, aamam, illa, illai, saar, thaan, than, sollunga, kodunga, naalaikku,
+    aagum, romba, konjam, vanthu, irukku,
+  ]

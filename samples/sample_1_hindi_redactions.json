@@ -1,0 +1,30 @@
+{
+  "input": "sample_1_hindi.wav",
+  "language": "hi",
+  "redactions": [
+    {
+      "start_sec": 7.41,
+      "end_sec": 8.65,
+      "type": "name",
+      "text": "प्रिया शर्मा"
+    },
+    {
+      "start_sec": 9.46,
+      "end_sec": 10.56,
+      "type": "name",
+      "text": "प्रिया"
+    },
+    {
+      "start_sec": 14.51,
+      "end_sec": 19.33,
+      "type": "mobile",
+      "text": "9845012345"
+    },
+    {
+      "start_sec": 23.97,
+      "end_sec": 26.51,
+      "type": "pincode",
+      "text": "560034"
+    }
+  ]
+}

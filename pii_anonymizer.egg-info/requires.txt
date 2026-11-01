@@ -1,0 +1,11 @@
+faster-whisper>=1.1.0
+soundfile>=0.12.1
+numpy>=1.26.0
+scipy>=1.11.0
+PyYAML>=6.0
+rapidfuzz>=3.6.0
+indic-transliteration>=2.3.50
+
+[dev]
+pytest>=8.0.0
+edge-tts>=6.1.0

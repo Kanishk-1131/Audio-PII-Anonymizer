@@ -1,0 +1,30 @@
+{
+  "input": "sample_2_tamil.wav",
+  "language": "ta",
+  "redactions": [
+    {
+      "start_sec": 4.485,
+      "end_sec": 5.576,
+      "type": "name",
+      "text": "Karthik Rajan"
+    },
+    {
+      "start_sec": 6.85,
+      "end_sec": 7.463,
+      "type": "name",
+      "text": "Karthik"
+    },
+    {
+      "start_sec": 9.982,
+      "end_sec": 15.268,
+      "type": "mobile",
+      "text": "9941662037"
+    },
+    {
+      "start_sec": 18.933,
+      "end_sec": 21.382,
+      "type": "pincode",
+      "text": "600042"
+    }
+  ]
+}

@@ -1,0 +1,192 @@
+# Hindi language pack.
+# All entries are passed through textnorm.normalize() at load time, so
+# nukta / chandrabindu / case variants do not need to be listed twice.
+# NOTE: YAML silently keeps only the LAST value of a duplicated key - the
+# loader therefore re-checks for collisions between different values.
+code: hi
+name: Hindi
+whisper_language: hi
+include: [en]
+
+numbers:
+  digits:
+    "0": [शून्य, शुन्य, सुन्य, सून्य, शून्या, शुन्ना, सुन्न, जीरो, ज़ीरो, ज़ेरो, जेरो,
+          shunya, shoonya, sunya, shuny, shunye, sunna]
+    "1": [एक, एक्, वन, ek, aek]
+    "2": [दो, टू, do, dho]
+    "3": [तीन, थ्री, तिन, teen, tin, theen]
+    "4": [चार, फोर, फ़ोर, फ़ॉर, फॉर, char, chaar]
+    "5": [पांच, पाँच, पाच, पंच, फाइव, फ़ाइव, फाईव, paanch, panch, pach, paanc, paach]
+    "6": [छह, छः, छे, छ, छै, छेह, सिक्स, सिक्श, chhah, chhe, chah, che, chhey, chheh, chha, cheh, chhai]
+    "7": [सात, सेवन, सेवेन, saat, sat]
+    "8": [आठ, आट, एट, एइट, एईट, aath, aat, aanth]
+    "9": [नौ, नव, नाइन, नाईन, nau, nav, naw]
+  weak_digits:
+    "0": [ओ]
+    "9": [नो, no, now]
+  compounds:
+    "10": [दस, टेन, das, dus]
+    "11": [ग्यारह, ग्यारा, इलेवन, gyarah, gyara]
+    "12": [बारह, बारा, ट्वेल्व, barah, bara]
+    "13": [तेरह, थर्टीन, terah]
+    "14": [चौदह, चौदा, फोर्टीन, chaudah, chauda]
+    "15": [पंद्रह, पन्द्रह, पंद्रा, फिफ्टीन, pandrah, pandra]
+    "16": [सोलह, सोला, सिक्सटीन, solah, sola]
+    "17": [सत्रह, सतरह, सत्रा, सेवनटीन, satrah, satra]
+    "18": [अठारह, अठारा, एटीन, atharah, athara]
+    "19": [उन्नीस, नाइनटीन, unnees, unnis]
+    "20": [बीस, bees, bis]
+    "21": [इक्कीस, ikkees]
+    "22": [बाईस, बाइस, baees, bais]
+    "23": [तेईस, तेइस, teis]
+    "24": [चौबीस, chaubees]
+    "25": [पच्चीस, pachchees, pachees]
+    "26": [छब्बीस, chhabbees]
+    "27": [सत्ताईस, सत्ताइस, sattaees]
+    "28": [अट्ठाईस, अठ्ठाईस, अट्ठाइस, atthaees]
+    "29": [उनतीस, untees]
+    "30": [तीस, tees]
+    "31": [इकतीस, iktees]
+    "32": [बत्तीस, battees]
+    "33": [तैंतीस, तेंतीस, taintees]
+    "34": [चौंतीस, चौतीस, chauntees]
+    "35": [पैंतीस, पैतीस, paintees]
+    "36": [छत्तीस, chhattees]
+    "37": [सैंतीस, सैतीस, saintees]
+    "38": [अड़तीस, अडतीस, adtees]
+    "39": [उनतालीस, untaalees]
+    "40": [चालीस, chaalees, chalees]
+    "41": [इकतालीस, iktaalees]
+    "42": [बयालीस, bayaalees]
+    "43": [तैंतालीस, तेंतालीस, taintaalees]
+    "44": [चवालीस, चौवालीस, chavaalees]
+    "45": [पैंतालीस, paintaalees]
+    "46": [छियालीस, chhiyaalees]
+    "47": [सैंतालीस, saintaalees]
+    "48": [अड़तालीस, अडतालीस, adtaalees]
+    "49": [उनचास, unchaas]
+    "50": [पचास, pachaas, pachas]
+    "51": [इक्यावन, ikyaavan]
+    "52": [बावन, baavan]
+    "53": [तिरेपन, तिरपन, tirepan]
+    "54": [चौवन, चव्वन, chauvan]
+    "55": [पचपन, pachpan]
+    "56": [छप्पन, chhappan]
+    "57": [सत्तावन, sattaavan]
+    "58": [अट्ठावन, अठ्ठावन, atthaavan]
+    "59": [उनसठ, unsath]
+    "60": [साठ, saath]
+    "61": [इकसठ, iksath]
+    "62": [बासठ, baasath]
+    "63": [तिरसठ, tirsath]
+    "64": [चौंसठ, चौसठ, chaunsath]
+    "65": [पैंसठ, painsath]
+    "66": [छियासठ, chhiyaasath]
+    "67": [सड़सठ, सडसठ, sadsath]
+    "68": [अड़सठ, अडसठ, adsath]
+    "69": [उनहत्तर, unhattar]
+    "70": [सत्तर, sattar]
+    "71": [इकहत्तर, ikhattar]
+    "72": [बहत्तर, bahattar]
+    "73": [तिहत्तर, tihattar]
+    "74": [चौहत्तर, chauhattar]
+    "75": [पचहत्तर, pachhattar]
+    "76": [छिहत्तर, chhihattar]
+    "77": [सतहत्तर, sathattar]
+    "78": [अठहत्तर, athhattar]
+    "79": [उन्यासी, उनासी, unyaasi]
+    "80": [अस्सी, assi]
+    "81": [इक्यासी, ikyaasi]
+    "82": [बयासी, bayaasi]
+    "83": [तिरासी, tiraasi]
+    "84": [चौरासी, chauraasi]
+    "85": [पचासी, pachaasi]
+    "86": [छियासी, chhiyaasi]
+    "87": [सत्तासी, sattaasi]
+    "88": [अट्ठासी, अठ्ठासी, atthaasi]
+    "89": [नवासी, navaasi]
+    "90": [नब्बे, nabbe]
+    "91": [इक्यानवे, ikyaanave]
+    "92": [बानवे, baanave]
+    "93": [तिरानवे, tiraanave]
+    "94": [चौरानवे, chauraanave]
+    "95": [पचानवे, pachaanave]
+    "96": [छियानवे, chhiyaanave]
+    "97": [सत्तानवे, sattaanave]
+    "98": [अट्ठानवे, अठ्ठानवे, atthaanave]
+    "99": [निन्यानवे, ninyaanave]
+  tens:
+    "2": [ट्वेंटी]
+    "3": [थर्टी]
+    "4": [फोर्टी]
+    "5": [फिफ्टी]
+    "6": [सिक्सटी]
+    "7": [सेवंटी, सेवेंटी]
+    "8": [एटी]
+    "9": [नाइंटी, नाइनटी]
+  hundred: [सौ, हंड्रेड, sau]
+  repeat:
+    "2": [डबल, डब्बल, डाबल, dabal, dubal]
+    "3": [ट्रिपल, ट्रिप्पल, तिहरा, tripal]
+
+keywords:
+  mobile: [मोबाइल, मोबाईल, मुबाइल, नंबर, नम्बर, नमबर, फोन, संपर्क, व्हाट्सएप, व्हाट्सऐप, mobile, number, nambar, phone]
+  pincode: [पिन, पिनकोड, पिन्कोड, कोड, पोस्टल, डाक, pin, code]
+
+fillers: [हां, जी, और, मतलब, उम, अ, आ, हम्म, अच्छा, तो, ओके, aur, matlab, haan, ji, accha]
+
+names:
+  # strong cues: the next word(s) are taken as a name
+  cues:
+    - मेरा नाम
+    - मेरा नाम है
+    - मेरा पूरा नाम
+    - हमारा नाम
+    - मेरा शुभ नाम
+    - mera naam
+    - mera naam hai
+    - hamara naam
+    - मायसेल्फ
+    - माई नेम इज
+  # weak cues: accepted if the word is a known name OR a terminator follows
+  weak_cues:
+    - नाम
+    - naam
+    - नाम है
+  # gazetteer cues: accepted only if the following word is a known name
+  gazetteer_cues:
+    - मैं
+    - main
+  frames:
+    - [मैं, बोल]
+    - [main, bol]
+    - [मैं, बात]
+  weak_frames:
+    - [मैं, हूं]
+    - [main, hoon]
+  skip_after_cue: [है, हैं, तो, जी, hai, to, ji]
+  terminators: [है, हैं, हूं, जी, hai, hoon, hun, ji, बोल, bol]
+  honorifics_after: [जी, सर, साहब, साब, मैडम, मेम, मैम, बाबू, भैया, दीदी, sahab, saab, bhaiya, didi]
+  honorifics_before: [श्री, श्रीमती, सुश्री, कुमारी, मिस्टर, मिसेज, मिस, डॉक्टर, डॉ, shri, shrimati]
+  # suffixes the ASR may glue to a name ("प्रियाजी"); stripped before a name is remembered
+  name_suffixes: [जी, ji]
+  stopwords: [
+    है, हैं, हूं, हो, था, थी, थे, जी, हां, नहीं, ना, क्या, कौन, कहां, कब, कैसे, क्यों,
+    मेरा, मेरी, मेरे, हमारा, हमारी, आपका, आपकी, आपके, आपको, आप, तुम, मैं, हम, वो, वह,
+    यह, ये, मुझे, मुझको, हमें, उन्हें, उसे, इसे, उसका, उसकी, इसका, इसकी,
+    नाम, बताइए, बताइये, बताइयेगा, बताएं, बतायें, बताए, बताईए, बताओ, बताना, बताया,
+    बताता, बताती, बोलिए, बोलिये, बोलो, बोल, बोला, बोली, दोहराता, दोहराती,
+    दीजिए, दीजिये, कीजिए, कीजिये, करें, करो, कर, करना, किया, रहा,
+    रही, रहे, गया, गई, चाहिए, सकता, सकती, सकते, देख, देखिए, चेक, लिख, लिखिए,
+    धन्यवाद, भन्यवाद, शुक्रिया, नमस्ते, नमस्कार, स्वागत, सेवा, ग्राहक, ठीक, अच्छा, सही,
+    बिल्कुल, और, या, लेकिन, का, की, के, को, से, में, पर, तो, भी, ही, एक, दो, तीन,
+    अब, फिर, सर, मैडम, मोबाइल, नंबर, नम्बर, नमबर, फोन, पिन, कोड, पता, एड्रेस, ऑर्डर, आर्डर, ओर्डर,
+    कल, आज, डिलीवर, दिलीवर, डिलीवरी, जाएगा, जायेगा, होगा, होगी, वाला, वाली, कृपया, प्लीज,
+    जरा, ओके, हेलो, हैलो, यहां, वहां, बात, कॉल, कस्टमर, केयर, कंपनी, अपना, अपनी,
+    अपने, इस, उस, जी हां, हांजी, परेशान, खुश, घर, बाहर, ऑफिस, अभी, बस, वैसे,
+    hai, hain, hoon, ho, tha, thi, ji, haan, nahi, nahin, kya, kaun, mera, meri, mere,
+    hamara, aapka, aapki, aapko, aap, main, hum, naam, bataiye, bataiyega, batao,
+    boliye, dijiye, kijiye, karo, kar, raha, rahi, dhanyavaad, dhanyawad, shukriya,
+    namaste, swagat, seva, grahak, theek, thik, accha, sahi, aur, ka, ki, ke, ko, se,
+    mein, par, bhi, hi, ab, phir, kal, aaj, jayega, hoga, kripya, apna, apni, abhi,
+  ]

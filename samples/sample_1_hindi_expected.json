@@ -1,0 +1,30 @@
+{
+  "input": "sample_1_hindi.wav",
+  "language": "hi",
+  "redactions": [
+    {
+      "start_sec": 7.784,
+      "end_sec": 8.57,
+      "type": "name",
+      "text": "Priya Sharma"
+    },
+    {
+      "start_sec": 10.16,
+      "end_sec": 10.506,
+      "type": "name",
+      "text": "Priya"
+    },
+    {
+      "start_sec": 14.589,
+      "end_sec": 19.235,
+      "type": "mobile",
+      "text": "9845012345"
+    },
+    {
+      "start_sec": 24.047,
+      "end_sec": 26.431,
+      "type": "pincode",
+      "text": "560034"
+    }
+  ]
+}

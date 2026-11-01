@@ -1,0 +1,115 @@
+# English base pack. It is merged into every Indian-language pack (via
+# `include: [en]`) because callers code-switch into English for digits,
+# "double"/"triple", "mobile number", "pin code", "my name is", ...
+code: en
+name: English
+whisper_language: en
+
+numbers:
+  # value -> spellings. Values 0-9 produce one digit.
+  digits:
+    "0": [zero, zeero, jero, nil, nought, naught]
+    "1": [one]
+    "2": [two]
+    "3": [three, tree, thri]
+    "4": [four, fore]
+    "5": [five, fife]
+    "6": [six, sicks]
+    "7": [seven]
+    "8": [eight]
+    "9": [nine, niner]
+  # Spellings that only count as a digit when they touch another digit
+  # (they are ordinary words otherwise: "to", "for", "oh", ...).
+  weak_digits:
+    "0": [oh, o, ou]
+    "1": [won]
+    "2": [to, too]
+    "4": [for]
+    "8": [ate]
+  # Words that always expand to a fixed two-digit string.
+  compounds:
+    "10": [ten]
+    "11": [eleven]
+    "12": [twelve]
+    "13": [thirteen]
+    "14": [fourteen]
+    "15": [fifteen]
+    "16": [sixteen]
+    "17": [seventeen]
+    "18": [eighteen]
+    "19": [nineteen]
+  # Tens that combine with a following unit word ("ninety eight" -> 98).
+  tens:
+    "2": [twenty]
+    "3": [thirty]
+    "4": [forty, fourty]
+    "5": [fifty]
+    "6": [sixty]
+    "7": [seventy]
+    "8": [eighty]
+    "9": [ninety]
+  hundred: [hundred]
+  repeat:
+    "2": [double, dubble, doubble, dabal]
+    "3": [triple, tripple, treble, tripal]
+
+keywords:
+  mobile: [mobile, phone, number, cell, contact, whatsapp, alternate, registered, numbers, mob]
+  pincode: [pin, pincode, code, postal, zip, zipcode, postcode]
+
+# Tokens that may sit inside a digit sequence without breaking it.
+fillers: [uh, um, umm, hmm, er, ah, aa, and, then, comma, okay, ok, yes, yeah, haan]
+
+names:
+  # Strong cues: whatever follows (minus fillers) is a name.
+  cues:
+    - my name is
+    - my name's
+    - my good name is
+    - my full name is
+    - name is
+    - myself
+    - this is mister
+  # Weak cues: the following word is accepted only if it is in the
+  # gazetteer or is followed by a terminator word / punctuation.
+  weak_cues:
+    - name
+    - speaking to
+    - talking to
+  # Gazetteer cues: the following word is accepted only if it is a known name.
+  gazetteer_cues:
+    - i am
+    - i'm
+    - this is
+    - hello
+    - thank you
+    - thanks
+    - okay
+  # Start ... end frames: "this is <NAME> speaking".
+  frames:
+    - [this is, speaking]
+    - [i am, speaking]
+    - [i am, calling]
+  # Weak frames: accepted only if the enclosed word is a known name.
+  weak_frames:
+    - [this is, here]
+    - [this is, from]
+  skip_after_cue: [is, mister, miss, mrs, mr, ms]
+  terminators: [only, here, speaking, sir, madam]
+  honorifics_after: [sir, madam, maam, mam, ma'am, ji, garu, saab, sahab]
+  honorifics_before: [mr, mrs, ms, miss, mister, missus, dr, doctor, shri, sri, smt, shrimati, kumari]
+  stopwords: [
+    a, an, the, is, am, are, was, were, be, been, my, your, our, his, her, their,
+    i, you, he, she, we, they, it, this, that, these, those, me, him, us, them,
+    yes, no, not, ok, okay, sure, fine, good, great, right, correct, wrong,
+    hello, hi, hey, thanks, thank, welcome, please, sorry, bye, goodbye, sir, madam,
+    name, number, mobile, phone, pin, code, pincode, address, order, delivery,
+    what, which, who, where, when, how, why, tell, say, give, speak, speaking,
+    calling, here, there, from, to, for, of, in, on, at, by, with, and, or, but,
+    so, then, just, only, also, very, much, can, could, will, would, shall,
+    should, may, might, do, does, did, done, have, has, had, get, got, go,
+    one, two, three, four, five, six, seven, eight, nine, zero, double, triple,
+    customer, care, service, support, agent, executive, company, call, account,
+    today, tomorrow, yesterday, now, later, again, same, full, good, morning,
+    evening, afternoon, actually, basically, like, um, uh, hmm, ji, haan,
+  ]

@@ -1,0 +1,62 @@
+# Kannada language pack (demonstrates adding a 3rd Indian language via a single YAML file).
+code: kn
+name: Kannada
+whisper_language: kn
+include: [en]
+
+numbers:
+  digits:
+    "0": [ಸೊನ್ನೆ, ಶೂನ್ಯ, ಜೀರೋ, sonne, shoonya, shunya]
+    "1": [ಒಂದು, ஒंदु, ondu, ondhu]
+    "2": [ಎರಡು, eradu, yeradu]
+    "3": [ಮೂರು, mooru, muru]
+    "4": [ನಾಲ್ಕು, naalku, nalku]
+    "5": [ಐದು, aidu, aydhu]
+    "6": [ಆರು, aaru, aru]
+    "7": [ಏಳು, eelu, yelu, elu]
+    "8": [ಎಂಟು, entu, yentu]
+    "9": [ಒಂಬತ್ತು, ombattu, ombathu]
+  compounds:
+    "10": [ಹತ್ತು, hattu, hatthu]
+    "20": [ಇಪ್ಪತ್ತು, ippattu]
+    "30": [ಮೂವತ್ತು, moovattu]
+    "40": [ನಲವತ್ತು, nalavattu]
+    "50": [ಐವತ್ತು, aivattu]
+    "60": [ಅರವತ್ತು, aravattu]
+    "70": [ಎಪ್ಪತ್ತು, eppattu]
+    "80": [ಎಂಬತ್ತು, embattu]
+    "90": [ತೊಂಬತ್ತು, tombattu]
+  hundred: [ನೂರು, nooru]
+  repeat:
+    "2": [ಡಬಲ್, dabal]
+    "3": [ಟ್ರಿಪಲ್, tripal]
+
+keywords:
+  mobile: [ಮೊಬೈಲ್, ನಂಬರ್, ಸಂಖ್ಯೆ, ಫೋನ್, mobile, number, phone]
+  pincode: [ಪಿನ್, ಪಿನ್ಕೋಡ್, ಕೋಡ್, ಅಂಚೆ, pin, code, pincode]
+
+fillers: [ಹೌದು, ಸರಿ, ಓಕೆ, ಮತ್ತೆ, haudu, sari]
+
+names:
+  cues:
+    - ನನ್ನ ಹೆಸರು
+    - nanna hesaru
+  weak_cues:
+    - ಹೆಸರು
+    - hesaru
+  gazetteer_cues:
+    - ನಾನು
+    - ಧನ್ಯವಾದ
+    - ನಮಸ್ಕಾರ
+  frames:
+    - [ನಾನು, ಮಾತಾಡ್ತಿದ್ದೀನಿ]
+  skip_after_cue: [ಬಂದು]
+  terminators: [ಅಂತ, ಸರ್, ಮೇಡಂ]
+  honorifics_after: [ಸರ್, ಮೇಡಂ, ಅವರೇ, ಜಿ, sir, madam]
+  honorifics_before: [ಶ್ರೀ, ಶ್ರೀಮತಿ, ಡಾಕ್ಟರ್]
+  name_suffixes: [ಅವರೇ, ಜಿ]
+  stopwords: [
+    ನನ್ನ, ನಿಮ್ಮ, ನಾನು, ನೀವು, ಹೆಸರು, ಏನು, ಹೇಳಿ, ಧನ್ಯವಾದ, ನಮಸ್ಕಾರ, ಸರಿ, ಹೌದು, ಇಲ್ಲ,
+    ಮೊಬೈಲ್, ನಂಬರ್, ಸಂಖ್ಯೆ, ಫೋನ್, ಪಿನ್, ಕೋಡ್, ಆರ್ಡರ್, ನಾಳೆ, ಡೆಲಿವರಿ, ಆಗುತ್ತೆ,
+    nanna, nimma, naanu, neevu, hesaru, enu, heli, dhanyavaada, namaskara, sari,
+  ]

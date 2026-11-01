@@ -1,0 +1,2 @@
+[console_scripts]
+pii-anonymizer = pii_anonymizer.cli:main

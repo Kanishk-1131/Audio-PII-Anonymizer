@@ -1,0 +1,203 @@
+Metadata-Version: 2.4
+Name: pii-anonymizer
+Version: 1.0.0
+Summary: Audio PII Anonymizer for Indian-language customer-support call recordings
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: faster-whisper>=1.1.0
+Requires-Dist: soundfile>=0.12.1
+Requires-Dist: numpy>=1.26.0
+Requires-Dist: scipy>=1.11.0
+Requires-Dist: PyYAML>=6.0
+Requires-Dist: rapidfuzz>=3.6.0
+Requires-Dist: indic-transliteration>=2.3.50
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0.0; extra == "dev"
+Requires-Dist: edge-tts>=6.1.0; extra == "dev"
+
+# Audio PII Anonymizer
+
+A deterministic command-line tool that redacts spoken **customer names**, **10-digit mobile numbers**, and **6-digit PIN codes** from Indian-language customer-support call recordings (`.wav` or `.mp3`), replacing each PII span with a loudness-matched 1 kHz beep while leaving every other sample untouched.
+
+---
+
+## Features & Guarantees
+
+1. **No leaks**
+   - Handles spoken Indian digits, English code-switched digits (`"nine eight four five..."`), grouped digits (`9845 012 345`), compound numbers (`चौरानवे` = `94`), repeat words (`double`, `triple`, `डबल`, `டபுள்`), and colloquial Tamil forms (`ஒன்னு`, `ரெண்டு`, `மூணு`, `நாலு`, `அஞ்சு`, `பூஜ்யம்`).
+   - Detects customer names via multi-signal resolution: introduction cues (`मेरा नाम ...`, `என் பெயர் ...`), conversational frames (`मैं ... बोल रहा हूँ`, `நான் ... பேசுறேன்`), honorifics (`... जी`, `... சார்`, `श्री ...`), cross-script phonetic gazetteer matching, and **whole-call entity memory** (automatically redacts every agent read-back of a detected name anywhere in the call).
+   - **Energy-guided span snapping**: bridges intra-number pauses when Whisper attaches a multi-digit numeral's timestamp to the end of a digit run, while enforcing strict guardrails so adjacent non-PII words (`"मेरा नाम"`, `"मोबाइल नंबर"`, `"पिन कोड"`) are never clipped.
+
+2. **Minimal damage & bit-exact audio preservation**
+   - Output `<stem>_redacted.wav` has the **exact same frame count, sample rate, and channel count** as the input (0.0 ms duration drift).
+   - For PCM/float WAV inputs, every sample outside the beep intervals is **bit-for-bit identical** to the input recording.
+   - Inside each PII span, original samples are completely overwritten (not mixed) with a 1 kHz sine tone matched to the recording's active speech RMS, with 5 ms raised-cosine fade-in/out ramps to avoid clicks.
+
+3. **100% Repeatable**
+   - Uses deterministic beam decoding (`temperature=[0.0]`, `condition_on_previous_text=False`, fixed Silero VAD thresholds). Running the program twice on the same file produces byte-identical WAV and JSON outputs.
+
+4. **Plug-and-play language extensibility**
+   - Every language is defined purely in a declarative YAML file under [`pii_anonymizer/languages/`](pii_anonymizer/languages/). Adding a new Indian language (e.g., Kannada, Telugu, Marathi, Bengali) requires adding **one YAML file** (`<code>.yaml` with `include: [en]`) — zero Python changes required. Includes Hindi (`hi`), Tamil (`ta`), English (`en`), and a demonstration Kannada (`kn`) pack.
+
+---
+
+## Repository Structure
+
+```text
+.
+├── pii_anonymizer/
+│   ├── __init__.py
+│   ├── __main__.py          # `python -m pii_anonymizer` entry point
+│   ├── cli.py               # CLI argument parser & batch runner
+│   ├── pipeline.py          # End-to-end orchestration & output verification
+│   ├── asr.py               # Deterministic faster-whisper (Whisper large-v3) backend
+│   ├── textnorm.py          # Unicode normalization & cross-script phonetic key
+│   ├── tokens.py            # Sub-word tokenizer with proportional timestamp splitting
+│   ├── numbers.py           # Spoken digit / compound / repeater FSM & classifier
+│   ├── names.py             # Cue + frame + honorific + phonetic gazetteer + memory NER
+│   ├── spans.py             # Energy-guided span snapping & overlap merging
+│   ├── audio.py             # Bit-exact WAV/MP3 I/O & loudness-matched beep synthesis
+│   └── languages/
+│       ├── __init__.py      # YAML language pack loader & collision validator
+│       ├── en.yaml          # Shared English code-mix base pack
+│       ├── hi.yaml          # Hindi language pack
+│       ├── ta.yaml          # Tamil language pack (literary + colloquial spoken forms)
+│       ├── kn.yaml          # Kannada language pack (extensibility demonstration)
+│       └── gazetteer_names.txt
+├── samples/                 # Test call recordings + redacted WAVs + JSON reports
+│   ├── sample_1_hindi.wav
+│   ├── sample_1_hindi_redacted.wav
+│   ├── sample_1_hindi_redactions.json
+│   ├── sample_2_tamil.wav
+│   ├── sample_2_tamil_redacted.wav
+│   ├── sample_2_tamil_redactions.json
+│   ├── sample_3_hindi_codemix.wav
+│   ├── sample_3_hindi_codemix_redacted.wav
+│   ├── sample_3_hindi_codemix_redactions.json
+│   ├── sample_4_tamil_colloquial.wav
+│   ├── sample_4_tamil_colloquial_redacted.wav
+│   └── sample_4_tamil_colloquial_redactions.json
+├── scripts/
+│   └── generate_samples.py  # Synthesises multi-speaker test calls
+├── tests/
+│   └── test_anonymizer.py   # Automated unit & audio-invariant test suite
+├── WRITEUP.md               # 2-3 page technical write-up & evaluation report
+├── requirements.txt
+└── pyproject.toml
+```
+
+---
+
+## Installation & Setup
+
+### Prerequisites
+- Python 3.10+ (tested on Python 3.14, Windows/Linux/macOS)
+- No system `ffmpeg` binary is required (`soundfile` / `libsndfile` and `PyAV` handle `.wav` and `.mp3` natively).
+
+### Install in a Virtual Environment
+
+**Windows (PowerShell):**
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -e .
+```
+
+**Linux / macOS (Bash):**
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+pip install -e .
+```
+
+> **Note:** On the first run, `faster-whisper` automatically downloads `Systran/faster-whisper-large-v3` (~3 GB) to your HuggingFace cache (`~/.cache/huggingface/hub`). Subsequent runs execute completely offline.
+
+---
+
+## How to Run
+
+### 1. Redact a Single Audio File (`.wav` or `.mp3`)
+
+```powershell
+# Hindi call
+.\.venv\Scripts\python.exe -m pii_anonymizer samples\sample_1_hindi.wav --lang hi
+
+# Tamil call
+.\.venv\Scripts\python.exe -m pii_anonymizer samples\sample_2_tamil.wav --lang ta
+```
+
+Or using the installed console script:
+```powershell
+.\.venv\Scripts\pii-anonymizer.exe call_001.wav --lang hi
+```
+
+This produces two files alongside `call_001.wav` (or inside `--out-dir` if specified):
+- `call_001_redacted.wav` — identical length, sample rate, and channels, with each PII span replaced by a 1 kHz beep.
+- `call_001_redactions.json` — structured report of every redacted span:
+  ```json
+  {
+    "input": "sample_1_hindi.wav",
+    "language": "hi",
+    "redactions": [
+      {
+        "start_sec": 7.46,
+        "end_sec": 8.6,
+        "type": "name",
+        "text": "प्रिया शर्मा"
+      },
+      {
+        "start_sec": 9.78,
+        "end_sec": 10.64,
+        "type": "name",
+        "text": "प्रिया"
+      },
+      {
+        "start_sec": 13.87,
+        "end_sec": 19.47,
+        "type": "mobile",
+        "text": "9845012345"
+      },
+      {
+        "start_sec": 23.4,
+        "end_sec": 26.64,
+        "type": "pincode",
+        "text": "560034"
+      }
+    ]
+  }
+  ```
+
+### 2. Process an Entire Folder of Recordings
+
+```powershell
+.\.venv\Scripts\python.exe -m pii_anonymizer samples\ --lang hi --out-dir outputs\
+```
+Every `.wav` and `.mp3` inside the folder (automatically skipping `*_redacted.wav` files) is processed in batch while loading the Whisper model only once.
+
+### 3. List Installed Languages
+
+```powershell
+.\.venv\Scripts\python.exe -m pii_anonymizer --list-languages
+```
+
+### 4. Run the Automated Test Suite
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -v
+```
+
+---
+
+## Adding a New Indian Language
+
+Adding a language such as Telugu (`te`), Marathi (`mr`), or Bengali (`bn`) requires **no Python code changes**:
+
+1. Create `pii_anonymizer/languages/<code_iso639_1>.yaml` (for example, `te.yaml`).
+2. Add `include: [en]` at the top so English digits, `"double"`/`"triple"`, and English cues are automatically inherited.
+3. Fill in `numbers` (`digits`, `compounds`, `tens`, `hundred`, `repeat`), `keywords` (`mobile`, `pincode`), `fillers`, and `names` (`cues`, `weak_cues`, `gazetteer_cues`, `frames`, `honorifics_before`, `honorifics_after`, `stopwords`).
+4. If the language uses a new Indic script, add its `indic_transliteration.sanscript` mapping (3 lines) in `pii_anonymizer/textnorm.py` so cross-script phonetic name matching works automatically.
+
+See [`pii_anonymizer/languages/kn.yaml`](pii_anonymizer/languages/kn.yaml) for a complete working example of Kannada (`--lang kn`).

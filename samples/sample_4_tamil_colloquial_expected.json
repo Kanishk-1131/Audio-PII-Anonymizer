@@ -1,0 +1,30 @@
+{
+  "input": "sample_4_tamil_colloquial.wav",
+  "language": "ta",
+  "redactions": [
+    {
+      "start_sec": 4.183,
+      "end_sec": 5.269,
+      "type": "name",
+      "text": "Divya Krishnan"
+    },
+    {
+      "start_sec": 6.544,
+      "end_sec": 7.054,
+      "type": "name",
+      "text": "Divya"
+    },
+    {
+      "start_sec": 10.894,
+      "end_sec": 15.945,
+      "type": "mobile",
+      "text": "8765432221"
+    },
+    {
+      "start_sec": 19.439,
+      "end_sec": 22.127,
+      "type": "pincode",
+      "text": "641001"
+    }
+  ]
+}

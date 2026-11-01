@@ -1,0 +1,30 @@
+{
+  "input": "sample_2_tamil.wav",
+  "language": "ta",
+  "redactions": [
+    {
+      "start_sec": 4.4,
+      "end_sec": 5.61,
+      "type": "name",
+      "text": "கார்திக் ராஜன்"
+    },
+    {
+      "start_sec": 6.77,
+      "end_sec": 7.43,
+      "type": "name",
+      "text": "கார்திக்"
+    },
+    {
+      "start_sec": 9.9,
+      "end_sec": 15.36,
+      "type": "mobile",
+      "text": "994166237"
+    },
+    {
+      "start_sec": 18.87,
+      "end_sec": 21.47,
+      "type": "pincode",
+      "text": "600042"
+    }
+  ]
+}

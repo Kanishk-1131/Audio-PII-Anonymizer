@@ -1,0 +1,42 @@
+{
+  "input": "sample_3_hindi_codemix.wav",
+  "language": "hi",
+  "redactions": [
+    {
+      "start_sec": 3.486,
+      "end_sec": 4.45,
+      "type": "name",
+      "text": "Rahul Verma"
+    },
+    {
+      "start_sec": 6.848,
+      "end_sec": 7.362,
+      "type": "name",
+      "text": "Rahul"
+    },
+    {
+      "start_sec": 13.036,
+      "end_sec": 17.171,
+      "type": "mobile",
+      "text": "9810223456"
+    },
+    {
+      "start_sec": 18.953,
+      "end_sec": 22.593,
+      "type": "mobile",
+      "text": "9810223456"
+    },
+    {
+      "start_sec": 27.858,
+      "end_sec": 30.017,
+      "type": "pincode",
+      "text": "110001"
+    },
+    {
+      "start_sec": 31.258,
+      "end_sec": 31.772,
+      "type": "name",
+      "text": "Rahul"
+    }
+  ]
+}

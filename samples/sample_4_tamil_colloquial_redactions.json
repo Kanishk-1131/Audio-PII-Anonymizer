@@ -1,0 +1,30 @@
+{
+  "input": "sample_4_tamil_colloquial.wav",
+  "language": "ta",
+  "redactions": [
+    {
+      "start_sec": 4.09,
+      "end_sec": 5.36,
+      "type": "name",
+      "text": "திவியா கிரிஷ்னன்"
+    },
+    {
+      "start_sec": 5.79,
+      "end_sec": 7.13,
+      "type": "name",
+      "text": "திவியா"
+    },
+    {
+      "start_sec": 10.81,
+      "end_sec": 16.02,
+      "type": "mobile",
+      "text": "87654321"
+    },
+    {
+      "start_sec": 19.36,
+      "end_sec": 22.21,
+      "type": "pincode",
+      "text": "6410001"
+    }
+  ]
+}
