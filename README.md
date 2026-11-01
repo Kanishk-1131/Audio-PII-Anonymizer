@@ -90,7 +90,7 @@ Live microphone: Run .\run_ui.bat → 🎙 2. Record Your Voice (Mic) → speak 
 Generate a 2-speaker call from text via CLI (scripts/make_speech.py, requires internet for neural TTS):
 powershell
 .\.venv\Scripts\python.exe scripts\make_speech.py --lang hi --name custom_call --anonymize --open --text "Agent: नमस्ते, अपना नाम बताइए।`nCustomer: मेरा नाम अमित पटेल है।`nAgent: धन्यवाद अमित जी, मोबाइल नंबर बताइए।`nCustomer: नौ आठ एक शून्य दो तीन चार पाँच छह सात।"
-4. Output Specification
+4. Output Specification:
 
 For an input recording sample_1_hindi.wav (or .mp3), two files are produced:
 
